@@ -151,9 +151,7 @@ def fire_notification(trigger_name):
                             "title": rendered_title or "Notification",
                             "body": rendered_body,
                         }),
-                        vapid_private_key=str(
-                            settings.VAPID_PRIVATE_KEY_PATH
-                        ),
+                       vapid_private_key=os.getenv("VAPID_PRIVATE_KEY"),
                         vapid_claims={
                             "sub": (
                                 f"mailto:"
@@ -276,9 +274,7 @@ def send_template_notification(template):
                     "title": rendered_title or "Notification",
                     "body": rendered_body,
                 }),
-                vapid_private_key=str(
-                    settings.VAPID_PRIVATE_KEY_PATH
-                ),
+                vapid_private_key=os.getenv("VAPID_PRIVATE_KEY"),
                 vapid_claims={
                     "sub": (
                         f"mailto:"
