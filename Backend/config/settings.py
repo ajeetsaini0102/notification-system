@@ -34,17 +34,20 @@ VAPID_PUBLIC_KEY_PATH = BASE_DIR / os.getenv(
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-(0=7k0d3*g)1j-8_bvf3d*q8*eb_6kx2w3!k_f=2^+4-^10k1t'
+SECRET_KEY = os.getenv("SECRET_KEY")
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = [
-    "localhost",
-    "127.0.0.1",
-    "energy-crewman-engraver.ngrok-free.dev",
+    host.strip()
+    for host in os.getenv(
+        "ALLOWED_HOSTS",
+        "localhost,127.0.0.1"
+    ).split(",")
+    if host.strip()
 ]
-
 
 # Application definition
 
@@ -156,5 +159,10 @@ MAILERS = {
 }
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
+    origin.strip()
+    for origin in os.getenv(
+        "CORS_ALLOWED_ORIGINS",
+        "http://localhost:5173"
+    ).split(",")
+    if origin.strip()
 ]
