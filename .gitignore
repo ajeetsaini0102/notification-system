@@ -1,0 +1,5 @@
+Backend/private_key.pem
+Backend/public_key.pem
+Backend/.env
+Frontend/.env
+Backend/db.sqlite3
