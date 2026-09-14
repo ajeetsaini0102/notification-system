@@ -70,17 +70,48 @@ def fire_notification(trigger_name):
         )
 
         # EMAIL
+        # if template.channel.lower() == "email":
+        #     try:
+        #         send_mail(
+        #             subject=rendered_subject or rendered_title or "Notification",
+        #             message=rendered_body,
+        #             from_email=os.getenv("EMAIL_HOST_USER"),
+        #             recipient_list=[os.getenv("EMAIL_HOST_USER")],
+        #             fail_silently=False,
+        #         )
+
+        #         print("[EMAIL] Notification sent successfully")
+
+        #     except Exception as e:
+        #         print(f"[EMAIL] Failed: {e}")
+
+        # EMAIL
         if template.channel.lower() == "email":
             try:
-                send_mail(
-                    subject=rendered_subject or rendered_title or "Notification",
-                    message=rendered_body,
-                    from_email=os.getenv("EMAIL_HOST_USER"),
-                    recipient_list=[os.getenv("EMAIL_HOST_USER")],
-                    fail_silently=False,
+                resend_api_key = os.getenv("RESEND_API_KEY")
+
+                response = requests.post(
+                    "https://api.resend.com/emails",
+                    headers={
+                        "Authorization": f"Bearer {resend_api_key}",
+                        "Content-Type": "application/json",
+                    },
+                    json={
+                        "from": "onboarding@resend.dev",
+                        "to": [os.getenv("EMAIL_HOST_USER")],
+                        "subject": rendered_subject or rendered_title or "Notification",
+                        "text": rendered_body,
+                    },
+                    timeout=20,
                 )
 
-                print("[EMAIL] Notification sent successfully")
+                if response.ok:
+                    print("[EMAIL] Notification sent successfully")
+                    print(response.json())
+                else:
+                    print("[EMAIL] Failed")
+                    print(response.status_code)
+                    print(response.text)
 
             except Exception as e:
                 print(f"[EMAIL] Failed: {e}")
@@ -197,17 +228,34 @@ def send_template_notification(template):
         context
     )
 
+
     # EMAIL TEST
     if channel == "email":
-        send_mail(
-            subject=rendered_subject or rendered_title or "Notification",
-            message=rendered_body,
-            from_email=os.getenv("EMAIL_HOST_USER"),
-            recipient_list=[os.getenv("EMAIL_HOST_USER")],
-            fail_silently=False,
+        resend_api_key = os.getenv("RESEND_API_KEY")
+
+        response = requests.post(
+            "https://api.resend.com/emails",
+            headers={
+                "Authorization": f"Bearer {resend_api_key}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "from": "onboarding@resend.dev",
+                "to": [os.getenv("EMAIL_HOST_USER")],
+                "subject": rendered_subject or rendered_title or "Notification",
+                "text": rendered_body,
+            },
+            timeout=20,
         )
 
-        print("[EMAIL TEST] Notification sent successfully")
+        if response.ok:
+            print("[EMAIL TEST] Notification sent successfully")
+            print(response.json())
+        else:
+            print("[EMAIL TEST] Failed")
+            print(response.status_code)
+            print(response.text)
+            raise Exception(f"Resend API error: {response.status_code}")
 
     # WHATSAPP TEST
     elif channel == "whatsapp":
